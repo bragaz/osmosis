@@ -3,10 +3,10 @@ module github.com/osmosis-labs/osmosis
 go 1.15
 
 require (
-	github.com/cosmos/cosmos-sdk v0.42.6
+	github.com/cosmos/cosmos-sdk v0.42.5
 	github.com/cosmos/go-bip39 v1.0.0
 	github.com/cosmos/iavl v0.16.0
-	github.com/desmos-labs/desmos v0.17.6
+	github.com/desmos-labs/desmos v0.17.3-0.20210810125005-4aea4fd246cc
 	github.com/gogo/protobuf v1.3.3
 	github.com/golang/protobuf v1.5.2
 	github.com/gorilla/mux v1.8.0

@@ -2,6 +2,8 @@ package cmd
 
 import (
 	"encoding/hex"
+	"github.com/desmos-labs/desmos/app"
+	"github.com/osmosis-labs/osmosis/app/params"
 	"io/ioutil"
 	"strings"
 
@@ -13,7 +15,6 @@ import (
 
 	profilescliutils "github.com/desmos-labs/desmos/x/profiles/client/utils"
 	"github.com/desmos-labs/desmos/x/profiles/types"
-	"github.com/osmosis-labs/osmosis/app/params"
 )
 
 // GetGenerateChainlinkJSONCmd returns the command allowing to generate the chain link json file for creating chain link
@@ -27,18 +28,16 @@ func GetGenerateChainlinkJSONCmd() *cobra.Command {
 				return err
 			}
 
-			cdc := params.MakeEncodingConfig()
-
 			chainLinkJSON, err := GenerateChainLinkJSON(
 				clientCtx,
 				params.Bech32PrefixAccAddr,
-				cdc,
 			)
 			if err != nil {
 				return err
 			}
 
-			bz, err := cdc.Marshaler.MarshalJSON(&chainLinkJSON)
+			cdc, _ := app.MakeCodecs()
+			bz, err := cdc.MarshalJSON(&chainLinkJSON)
 			if err != nil {
 				return err
 			}
@@ -58,7 +57,7 @@ func GetGenerateChainlinkJSONCmd() *cobra.Command {
 }
 
 // GenerateChainLinkJSON returns ChainLinkJSON instance for creating chain link
-func GenerateChainLinkJSON(clientCtx client.Context, prefix string, cdc params.EncodingConfig) (profilescliutils.ChainLinkJSON, error) {
+func GenerateChainLinkJSON(clientCtx client.Context, prefix string) (profilescliutils.ChainLinkJSON, error) {
 
 	// generate signature
 	addr, _ := sdk.Bech32ifyAddressBytes(prefix, clientCtx.GetFromAddress())
@@ -67,12 +66,14 @@ func GenerateChainLinkJSON(clientCtx client.Context, prefix string, cdc params.E
 		return profilescliutils.ChainLinkJSON{}, err
 	}
 
+	// create chain link json
+	cdc, _ := app.MakeCodecs()
 	chainLinkJSON := profilescliutils.NewChainLinkJSON(
 		types.NewBech32Address(addr, prefix),
 		types.NewProof(pubkey, hex.EncodeToString(sig), addr),
 		types.NewChainConfig(prefix),
 	)
-	if err := chainLinkJSON.UnpackInterfaces(cdc.Marshaler); err != nil {
+	if err := chainLinkJSON.UnpackInterfaces(cdc); err != nil {
 		return profilescliutils.ChainLinkJSON{}, err
 	}
 	return chainLinkJSON, nil
