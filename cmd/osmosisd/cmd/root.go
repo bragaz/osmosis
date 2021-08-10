@@ -113,6 +113,7 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 		ImportGenesisAccountsFromSnapshotCmd(osmosis.DefaultNodeHome),
 		tmcli.NewCompletionCmd(rootCmd, true),
 		testnetCmd(osmosis.ModuleBasics, banktypes.GenesisBalancesIterator{}),
+		GetGenerateChainlinkJSONCmd(),
 		debugCmd,
 		config.Cmd(),
 	)
